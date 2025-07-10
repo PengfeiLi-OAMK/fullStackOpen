@@ -1,3 +1,5 @@
 *.doc
+*.txt
 /part1 sample/
+/part2Sample/
 /Menu/
