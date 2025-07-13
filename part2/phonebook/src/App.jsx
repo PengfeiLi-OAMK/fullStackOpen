@@ -15,9 +15,6 @@ const App = () => {
   const [className, setClassName] = useState(null);
 
   useEffect(() => {
-    // axios
-    //   .get("http://localhost:3001/persons")
-    //   .then((response) => setPersons(response.data));
     personServices
       .getAll()
       .then((initialPersons) => setPersons(initialPersons));
