@@ -25,9 +25,10 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      //id: persons.length + 1,
     };
+
     const findPerson = persons.find((person) => person.name === newName);
+
     if (findPerson) {
       const confirmUpdate = window.confirm(
         `${findPerson.name}is already added to the phonebook,replace the old number with a new one?`
@@ -55,14 +56,25 @@ const App = () => {
           });
       }
     } else {
-      personServices.create(personObject).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-        setMessage(`Added ${returnedPerson.name}`);
-        setClassName("added");
-        setTimeout(() => {
-          setMessage(null);
-        }, 5000);
-      });
+      personServices
+        .create(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setMessage(`Added ${returnedPerson.name}`);
+          setClassName("added");
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          console.log(error.response.data.error);
+          setMessage(error.response.data.error);
+          setClassName("error");
+          setTimeout(() => {
+            setMessage(null);
+          }, 5000);
+         
+        });
     }
     setNewName("");
     setNewNumer("");

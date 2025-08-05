@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJvb3QiLCJpZCI6IjY4ODNjYmE4NzgyM2FjZjEwZTA3ZTk5NSIsImlhdCI6MTc1NDMwNjYyMX0.aeMEUF1Q3o00YkUL9En23Kk6oO5-4LAbEGbpjEAz9qk
+
+{
+  "title": "New Blog Post",
+  "author": "felix",
+  "url": "http://localhost:3003/api/blogs/8",
+  "likes": 10
+}
