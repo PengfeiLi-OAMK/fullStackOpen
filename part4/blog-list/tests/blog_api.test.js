@@ -82,7 +82,7 @@ describe('when there is initially some notes saved', () => {
       assert(urls.includes(newBlog.url))
     })
     
-    test('a blog without token will be responded with 401', async () => {
+    test('a blog without token will be responded with 401 and not saved', async () => {
       const newBlog = {
         title: 'Test blog',
         author: 'Tester',
@@ -95,6 +95,8 @@ describe('when there is initially some notes saved', () => {
         .send(newBlog)
         .expect(401)
       assert.match(response.body.error, /token/i)
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length)
     })
 
     test('a blog without likes will default to the value 0', async () => {
