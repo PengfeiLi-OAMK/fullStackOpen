@@ -3,7 +3,6 @@ const { request } = require('express')
 const Blog = require('../models/blog')
 const middleware = require('../utils/middleware')
 
-
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   response.json(blogs)
@@ -21,6 +20,7 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   })
 
   newBlog = await blog.save()
+  await newBlog.populate('user', { username: 1, name: 1 })
   response.status(201).json(newBlog)
 
   // blog.save().then((result) => {
@@ -32,14 +32,14 @@ blogsRouter.delete(
   '/:id',
   middleware.userExtractor,
   async (request, response) => {
-    const useRequestDelete = request.user
+    const userRequestDelete = request.user
 
     const blog = await Blog.findById(request.params.id)
 
     if (!blog) {
       return response.status(404).json({ error: 'blog not found' })
     }
-    if (useRequestDelete._id.toString() !== blog.user.toString()) {
+    if (userRequestDelete._id.toString() !== blog.user.toString()) {
       return response
         .status(401)
         .json({ error: 'unauthorized to delete this blog' })
@@ -51,7 +51,7 @@ blogsRouter.delete(
 )
 
 blogsRouter.put('/:id', async (request, response) => {
-  const { likes } = request.body
+  const { title, author, url, likes } = request.body
   if (likes === undefined) {
     return response.status(400).json({ error: 'likes field is required' })
   }
@@ -62,9 +62,12 @@ blogsRouter.put('/:id', async (request, response) => {
     return response.status(404).end()
   }
 
+  blog.title = title
+  blog.author = author
+  blog.url = url
   blog.likes = likes
   const updatedBlog = await blog.save()
-
+  await updatedBlog.populate('user', { username: 1, name: 1 })
   return response.json(updatedBlog)
 })
 
