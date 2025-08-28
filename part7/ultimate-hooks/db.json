@@ -1,0 +1,38 @@
+{
+  "notes": [
+    {
+      "id": 1,
+      "content": "custom-hooks are awesome!"
+    },
+    {
+      "id": 2,
+      "content": "best feature ever <3"
+    },
+    {
+      "content": "The useResource custom hook returns an array of two items just like the state hooks. ",
+      "id": 3
+    }
+  ],
+  "persons": [
+    {
+      "id": 1,
+      "name": "mluukkai",
+      "number": "040-5483923"
+    },
+    {
+      "id": 2,
+      "name": "hellas",
+      "number": "012-123123"
+    },
+    {
+      "name": "felix",
+      "number": "080-9876556",
+      "id": 3
+    },
+    {
+      "name": "jake",
+      "number": "070-8978980",
+      "id": 4
+    }
+  ]
+}
