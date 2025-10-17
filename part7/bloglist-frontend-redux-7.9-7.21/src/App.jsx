@@ -1,131 +1,119 @@
-import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
-import blogService from './services/blogs'
-import loginService from './services/login'
-import Notification from './components/Notification'
-import Togglable from './components/Togglable'
-import BlogForm from './components/BlogForm'
+import { useEffect } from 'react'
+import { Routes, Route, Link, Navigate } from 'react-router-dom'
 import './index.css'
 import LoginForm from './components/LoginForm'
+import Home from './components/Home'
+import Users from './components/Users'
+import User from './components/User'
+import BlogPage from './components/BlogPage'
 import { useDispatch } from 'react-redux'
-import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs } from './reducers/blogReducer'
+import { initializeUser, logoutUser } from './reducers/userReducer'
+import { useSelector } from 'react-redux'
+import { Navbar, Nav } from 'react-bootstrap'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   const dispatch = useDispatch()
-
-  const blogFormRef = useRef()
+  // const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
+  useEffect(() => {
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-    }
-  }, [])
-
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    try {
-      const user = await loginService.login({ username, password })
-
-      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
-
-      setUsername('')
-      setPassword('')
-    } catch (exception) {
-      dispatch(setNotification('wrong username or password', 'error', 5))
-    }
-  }
-
-  const createNewBlog = async (blogData) => {
-    blogFormRef.current.toggleVisibility()
-    const createdBlog = await blogService.create(blogData)
-    setBlogs((pre) => pre.concat(createdBlog))
-    dispatch(
-      setNotification(
-        `a new blog ${createdBlog.title} by ${createdBlog.author} added`,
-        'added',
-        5
-      )
-    )
-  }
+    dispatch(initializeUser())
+  }, [dispatch])
 
   const logout = () => {
-    window.localStorage.removeItem('loggedBlogAppUser')
-    setUser(null)
-  }
-
-  const addLikes = async (updatedBlog) => {
-    const returnedBlog = await blogService.update(updatedBlog)
-    setBlogs(
-      blogs.map((blog) => (blog.id === returnedBlog.id ? returnedBlog : blog))
-    )
-    console.log(returnedBlog)
-    return returnedBlog
-  }
-  const deleteBlog = async (blog) => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      await blogService.remove(blog.id)
-      setBlogs(blogs.filter((b) => b.id !== blog.id))
-    }
-  }
-
-  const blogList = () => {
-    const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
-    return (
-      <>
-        {sortedBlogs.map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            addLikes={addLikes}
-            user={user}
-            onDelete={deleteBlog}
-          />
-        ))}
-      </>
-    )
+    dispatch(logoutUser())
   }
 
   return (
-    <div>
-      {user === null && (
+    <div className="container">
+      {/* {user === null && (
         <>
           <h2>log in to application</h2>
           <Notification />
-          <LoginForm
-            handleLogin={handleLogin}
-            username={username}
-            handleUsernameChange={({ target }) => setUsername(target.value)}
-            password={password}
-            handlePasswordChange={({ target }) => setPassword(target.value)}
-          />
+          <LoginForm />
         </>
-      )}
+      )} */}
       {user !== null && (
         <>
-          <h2>blogs</h2>
-          <Notification />
-          <p>
+          <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+            <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+            <Navbar.Collapse id="responsive-navbar-nav">
+              <Nav className="me-auto">
+                <Nav.Link
+                  href="#"
+                  as="span"
+                  className="d-flex align-items-center"
+                >
+                  <Link to="/">blogs</Link>
+                </Nav.Link>
+                <Nav.Link
+                  href="#"
+                  as="span"
+                  className="d-flex align-items-center"
+                >
+                  <Link to="/users">users</Link>
+                </Nav.Link>
+                {user ? (
+                  <Nav.Link as="span" className="d-flex align-items-center">
+                    <strong className="text-white me-2">
+                      {user.username} logged in
+                    </strong>
+                    <button
+                      onClick={logout}
+                      className="btn btn-sm btn-outline-light"
+                    >
+                      logout
+                    </button>
+                  </Nav.Link>
+                ) : (
+                  <Nav.Link href="#" as="span">
+                    <Link style={{ padding: '0 5px' }} to="/login">
+                      login
+                    </Link>
+                  </Nav.Link>
+                )}
+              </Nav>
+            </Navbar.Collapse>
+          </Navbar>
+          <h1>blogs</h1>
+          {/* <p>
             {user.username} logged in
             <button onClick={logout}>logout</button>
-          </p>
-          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-            <BlogForm createNewBlog={createNewBlog} />
+          </p> */}
+
+          {/* <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+            <BlogForm onSuccess={closeBlogForm} />
           </Togglable>
-          {blogList()}
+          <BlogList user={user} /> */}
         </>
       )}
+      <Routes>
+        <Route
+          path="/"
+          element={user ? <Home /> : <Navigate to="/login" replace />}
+          // element={user ? <Users /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/users"
+          element={user ? <Users /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/" replace /> : <LoginForm />}
+        />
+        <Route
+          path="/users/:id"
+          element={user ? <User /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/blogs/:id"
+          element={user ? <BlogPage /> : <Navigate to="/login" replace />}
+        />
+      </Routes>
     </div>
   )
 }

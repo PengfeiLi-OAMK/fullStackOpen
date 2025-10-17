@@ -1,44 +1,50 @@
-import PropTypes from 'prop-types'
+import { useDispatch } from 'react-redux'
+import { loginUser } from '../reducers/userReducer'
+import Notification from './Notification'
+import { Form, Button } from 'react-bootstrap'
 
-const LoginForm = ({
-  handleLogin,
-  username,
-  handleUsernameChange,
-  password,
-  handlePasswordChange,
-}) => (
-  <>
-    <form onSubmit={handleLogin}>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          value={username}
-          data-testid="username"
-          onChange={handleUsernameChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          type="text"
-          id="password"
-          value={password}
-          data-testid="password"
-          onChange={handlePasswordChange}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  </>
-)
+const LoginForm = () => {
+  const dispatch = useDispatch()
+  const handleLogin = (event) => {
+    event.preventDefault()
+    const username = event.target.username.value
+    const password = event.target.password.value
+    const credentials = { username, password }
+    dispatch(loginUser(credentials))
+    event.target.username.value = ''
+    event.target.password.value = ''
+  }
 
-LoginForm.propTypes = {
-  handleLogin: PropTypes.func.isRequired,
-  handleUsernameChange: PropTypes.func.isRequired,
-  handlePasswordChange: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
+  return (
+    <>
+      <h2>log in to application</h2>
+      <Notification />
+      <Form onSubmit={handleLogin}>
+        <Form.Group controlId="username" className="mb-3">
+          <Form.Label>Username</Form.Label>
+          <Form.Control
+            type="text"
+            // id="username"
+            name="username"
+            data-testid="username"
+          />
+        </Form.Group>
+        <Form.Group controlId="password" className="mb-3">
+          {/* <label htmlFor="password">Password</label> */}
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            type="password"
+            // id="password"
+            name="password"
+            data-testid="password"
+          />
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          login
+        </Button>
+      </Form>
+    </>
+  )
 }
+
 export default LoginForm

@@ -1,36 +1,29 @@
-import { useState } from 'react'
-const Blog = ({ blog, addLikes, user, onDelete }) => {
+// import { useState } from 'react'
+// import { useDispatch } from 'react-redux'
+// import { addLikes, deleteBlog } from '../reducers/blogReducer'
+import { Link } from 'react-router-dom'
+const Blog = ({ blog }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
+    // border: 'solid',
+    // borderWidth: 1,
     marginBottom: 5,
   }
-  const [visible, setVisible] = useState(false)
-  const canDelete = user && user.id === blog.user.id
-  const handleLike = () => {
-    const updatedBlog = { ...blog, likes: blog.likes + 1 }
-    addLikes(updatedBlog)
-  }
+  // const [visible, setVisible] = useState(false)
+  // const canDelete = user && user.id === blog.user.id
+  // const dispatch = useDispatch()
 
   return (
     <div style={blogStyle} className="blog">
       <p>
-        {blog.title} {blog.author}
-        <button onClick={() => setVisible(!visible)}>
+        <Link to={`/blogs/${blog.id}`}>
+          {blog.title} {blog.author}
+        </Link>
+        {/* <button onClick={() => setVisible(!visible)}>
           {visible ? 'hide' : 'view'}
-        </button>
+        </button> */}
       </p>
-      {visible && (
-        <>
-          <p>{blog.url}</p>
-          <p>{blog.likes} likes</p>
-          <button onClick={handleLike}>like</button>
-          <p>added by {blog.user.username}</p>
-          {canDelete && <button onClick={() => onDelete(blog)}>remove</button>}
-        </>
-      )}
     </div>
   )
 }
