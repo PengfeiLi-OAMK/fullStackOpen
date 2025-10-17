@@ -20,6 +20,8 @@ blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
   })
 
   newBlog = await blog.save()
+  creator.blogs = creator.blogs.concat(newBlog._id)
+  await creator.save()
   await newBlog.populate('user', { username: 1, name: 1 })
   response.status(201).json(newBlog)
 
@@ -70,5 +72,24 @@ blogsRouter.put('/:id', async (request, response) => {
   await updatedBlog.populate('user', { username: 1, name: 1 })
   return response.json(updatedBlog)
 })
+
+blogsRouter.post(
+  '/:id/comments',
+  middleware.userExtractor,
+  async (request, response) => {
+    const { comment } = request.body
+    if (!comment) {
+      return response.status(400).json({ error: 'comment is required' })
+    }
+    const blog = await Blog.findById(request.params.id)
+    if (!blog) {
+      return response.status(404).end()
+    }
+    blog.comments = blog.comments.concat(comment)
+    const updatedBlog = await blog.save()
+    await updatedBlog.populate('user', { username: 1, name: 1 })
+    return response.status(201).json(updatedBlog)
+  }
+)
 
 module.exports = blogsRouter
